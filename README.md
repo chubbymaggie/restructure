@@ -46,7 +46,7 @@ INPUT:
 ![foo.dot subgraph](https://raw.githubusercontent.com/decomp/restructure/master/testdata/foo.png)
 
 OUTPUT:
-* [foo.json](testdata/json.dot): structured control flow graph.
+* [foo.json](testdata/foo.json): structured control flow graph.
 
 ## Public domain
 

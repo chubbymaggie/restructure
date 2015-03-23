@@ -26,7 +26,7 @@ Flags:
 
 ## Examples
 
-1) Recover the high-level control flow primitives from the control flow graph [foo.dot](testdata.dot).
+1) Recover the high-level control flow primitives from the control flow graph [foo.dot](testdata/foo.dot).
 
 ```bash
 $ restructure foo.dot
@@ -46,7 +46,7 @@ INPUT:
 ![foo.dot subgraph](https://raw.githubusercontent.com/decomp/restructure/master/testdata/foo.png)
 
 OUTPUT:
-* [foo.json]: structured control flow graph.
+* [foo.json](testdata/json.dot): structured control flow graph.
 
 ## Public domain
 

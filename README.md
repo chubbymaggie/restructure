@@ -20,7 +20,7 @@ go get decomp.org/x/cmd/restructure
 restructure [OPTION]... CFG.dot
 
 Flags:
-  -prims="": Comma-separated list of file names to control flow primitive descriptions (*.dot)
+  -prims="": Comma-separated list of control flow primitive descriptions (*.dot)
   -q=false: Suppress non-error messages.
 ```
 

@@ -7,14 +7,14 @@
 // Example input
 //
 //    digraph foo {
-//       1 -> 2
-//       1 -> 4
-//       2 -> 3
-//       3 -> 4
-//       1 [label="entry"]
-//       2
-//       3
-//       4 [label="exit"]
+//       E -> F
+//       E -> H
+//       F -> G
+//       G -> H
+//       E [label="entry"]
+//       F
+//       G
+//       H [label="exit"]
 //    }
 //
 // Example output
@@ -25,16 +25,16 @@
 //          "if0": {
 //             "primitive": "if",
 //             "nodes": {
-//                "A": "1",
+//                "A": "E",
 //                "B": "list0",
-//                "C": "4",
+//                "C": "H",
 //             },
 //          },
 //          "list0": {
 //             "primitive": "list",
 //             "nodes": {
-//                "A": "3",
-//                "B": "4",
+//                "A": "F",
+//                "B": "G",
 //             },
 //          },
 //       },

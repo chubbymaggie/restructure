@@ -31,13 +31,13 @@ Flags:
 ```bash
 $ restructure foo.dot
 // Output:
-// Isomorphism of "list" found at node "2":
-//    "A"="2"
-//    "B"="3"
-// Isomorphism of "if" found at node "1":
-//    "A"="1"
+// Isomorphism of "list" found at node "F":
+//    "A"="F"
+//    "B"="G"
+// Isomorphism of "if" found at node "E":
+//    "A"="E"
 //    "B"="list0"
-//    "C"="4"
+//    "C"="H"
 ```
 
 INPUT:
@@ -47,6 +47,14 @@ INPUT:
 
 OUTPUT:
 * [foo.json](testdata/foo.json): structured control flow graph.
+
+```c
+if E {
+    F
+    G
+}
+H
+```
 
 ## Public domain
 

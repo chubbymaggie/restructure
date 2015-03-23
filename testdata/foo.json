@@ -4,16 +4,16 @@
 		"if0": {
 			"primitive": "if",
 			"nodes": {
-				"A": "1",
+				"A": "E",
 				"B": "list0",
-				"C": "4",
+				"C": "H",
 			},
 		},
 		"list0": {
 			"primitive": "list",
 			"nodes": {
-				"A": "3",
-				"B": "4",
+				"A": "F",
+				"B": "G",
 			},
 		},
 	},

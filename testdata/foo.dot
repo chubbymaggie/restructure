@@ -1,0 +1,10 @@
+digraph foo {
+	1 -> 2
+	1 -> 4
+	2 -> 3
+	3 -> 4
+	1 [label="entry"]
+	2
+	3
+	4 [label="exit"]
+}

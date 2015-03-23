@@ -1,0 +1,20 @@
+{
+	"entry": "if0",
+	"primitives": {
+		"if0": {
+			"primitive": "if",
+			"nodes": {
+				"A": "1",
+				"B": "list0",
+				"C": "4",
+			},
+		},
+		"list0": {
+			"primitive": "list",
+			"nodes": {
+				"A": "3",
+				"B": "4",
+			},
+		},
+	},
+}

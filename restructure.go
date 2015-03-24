@@ -4,8 +4,7 @@
 // which describes how the high-level control flow primitives relate to the
 // nodes of the CFG.
 //
-// Usage
-//
+// Usage:
 //     restructure [OPTION]... CFG.dot
 //
 //     Flags:
@@ -13,8 +12,7 @@
 //             Comma-separated list of control flow primitives (*.dot).
 //       -v    Verbose output.
 //
-// Example input
-//
+// Example input:
 //    digraph foo {
 //       E -> F
 //       E -> H
@@ -26,8 +24,7 @@
 //       H [label="exit"]
 //    }
 //
-// Example output
-//
+// Example output:
 //    [
 //       {
 //          "prim": "list",

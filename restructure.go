@@ -1,8 +1,17 @@
 // restructure is a tool which recovers high-level control flow primitives from
 // control flow graphs (e.g. *.dot -> *.json). It takes an unstructured CFG (in
 // Graphviz DOT file format) as input and produces a structured CFG (in JSON),
-// describes how the high-level control flow primitives relate to the nodes of
-// the CFG.
+// which describes how the high-level control flow primitives relate to the
+// nodes of the CFG.
+//
+// Usage
+//
+//     restructure [OPTION]... CFG.dot
+//
+//     Flags:
+//       -prims string
+//             Comma-separated list of control flow primitives (*.dot).
+//       -v    Verbose output.
 //
 // Example input
 //
@@ -59,22 +68,22 @@ import (
 )
 
 var (
-	// flagPrimitives is a comma-separated list of file names to control flow
-	// primitive descriptions, which are stored as Graphviz DOT files.
+	// flagPrimitives is a comma-separated list of control flow primitives
+	// (*.dot).
 	flagPrimitives string
 	// When flagVerbose is true, enable verbose output.
 	flagVerbose bool
 )
 
 func init() {
-	flag.StringVar(&flagPrimitives, "prims", "", "Comma-separated list of control flow primitive descriptions (*.dot).")
-	flag.BoolVar(&flagVerbose, "v", false, "Verbose.")
+	flag.StringVar(&flagPrimitives, "prims", "", "Comma-separated list of control flow primitives (*.dot).")
+	flag.BoolVar(&flagVerbose, "v", false, "Verbose output.")
 	flag.Usage = usage
 }
 
 const use = `
 restructure [OPTION]... CFG.dot
-Recover control flow structures from control flow graphs (e.g. *.dot -> *.json).
+Recover control flow primitives from control flow graphs (e.g. *.dot -> *.json).
 `
 
 func usage() {
@@ -114,6 +123,8 @@ func restructure(dotPath string) (prims []*Primitive, err error) {
 	if len(graph.Nodes.Nodes) == 0 {
 		return nil, errutil.Newf("unable to restructure empty graph %q", dotPath)
 	}
+
+	// Locate control flow primitives.
 	for len(graph.Nodes.Nodes) > 1 {
 		prim, err := findPrim(graph)
 		if err != nil {
@@ -121,12 +132,13 @@ func restructure(dotPath string) (prims []*Primitive, err error) {
 		}
 		prims = append(prims, prim)
 	}
+
 	return prims, nil
 }
 
-// A Primitive represents a high-level control flow primitive (e.g. if-
-// statement, for-loop) as mapping from the node names of the control flow
-// primitive descriptor to the node names of the control flow graph.
+// A Primitive represents a high-level control flow primitive (e.g. 2-way
+// conditional, pre-test loop) as a mapping from subgraph (graph representation
+// of a control flow primitive) node names to control flow graph node names.
 type Primitive struct {
 	// Primitive name; e.g. "if", "pre_loop", ...
 	Prim string `json:"prim"`

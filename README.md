@@ -6,7 +6,7 @@ This project is a *work in progress*. The implementation is *incomplete* and sub
 
 [![GoDoc](https://godoc.org/decomp.org/x/cmd/restructure?status.svg)](https://godoc.org/decomp.org/x/cmd/restructure)
 
-`restructure` is a tool which recovers high-level control flow primitives from control flow graphs (e.g. *.dot -> *.json). It takes an unstructured CFG (in Graphviz DOT file format) as input and produces a structured CFG (in JSON), describes how the high-level control flow primitives relate to the nodes of the CFG.
+`restructure` is a tool which recovers high-level control flow primitives from control flow graphs (e.g. *.dot -> *.json). It takes an unstructured CFG (in Graphviz DOT file format) as input and produces a structured CFG (in JSON), which describes how the high-level control flow primitives relate to the nodes of the CFG.
 
 ## Installation
 
@@ -20,8 +20,9 @@ go get decomp.org/x/cmd/restructure
 restructure [OPTION]... CFG.dot
 
 Flags:
-  -prims="": Comma-separated list of control flow primitive descriptions (*.dot)
-  -q=false: Suppress non-error messages.
+  -prims string
+        Comma-separated list of control flow primitives (*.dot).
+  -v    Verbose output.
 ```
 
 ## Examples

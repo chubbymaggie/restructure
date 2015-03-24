@@ -19,29 +19,29 @@
 //
 // Example output
 //
-//    {
-//       "entry": "if0",
-//       "primitives": {
-//          "if0": {
-//             "primitive": "if",
-//             "nodes": {
-//                "A": "E",
-//                "B": "list0",
-//                "C": "H",
-//             },
-//          },
-//          "list0": {
-//             "primitive": "list",
-//             "nodes": {
-//                "A": "F",
-//                "B": "G",
-//             },
-//          },
+//    [
+//       {
+//          "prim": "list",
+//          "node": "list0",
+//          "nodes": {
+//             "A": "F",
+//             "B": "G"
+//          }
 //       },
-//    }
+//       {
+//          "prim": "if",
+//          "node": "if0",
+//          "nodes": {
+//             "A": "E",
+//             "B": "list0",
+//             "C": "H"
+//          }
+//       },
+//    ]
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -62,13 +62,13 @@ var (
 	// flagPrimitives is a comma-separated list of file names to control flow
 	// primitive descriptions, which are stored as Graphviz DOT files.
 	flagPrimitives string
-	// When flagQuiet is true, suppress non-error messages.
-	flagQuiet bool
+	// When flagVerbose is true, enable verbose output.
+	flagVerbose bool
 )
 
 func init() {
 	flag.StringVar(&flagPrimitives, "prims", "", "Comma-separated list of control flow primitive descriptions (*.dot).")
-	flag.BoolVar(&flagQuiet, "q", false, "Suppress non-error messages.")
+	flag.BoolVar(&flagVerbose, "v", false, "Verbose.")
 	flag.Usage = usage
 }
 
@@ -89,41 +89,51 @@ func main() {
 		os.Exit(1)
 	}
 	dotPath := flag.Arg(0)
-	err := restructure(dotPath)
+	prims, err := restructure(dotPath)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	enc := json.NewEncoder(os.Stdout)
+	err = enc.Encode(prims)
 	if err != nil {
 		log.Fatalln(err)
 	}
 }
 
-// restructure attempts to recover the control flow structure of a given control
-// flow graph. It does so by repeatedly locating and merging structured
-// subgraphs into single nodes until the entire graph is reduced into a single
-// node or no structured subgraphs may be located.
-func restructure(dotPath string) error {
+// restructure attempts to recover the control flow primitives of a given
+// control flow graph. It does so by repeatedly locating and merging structured
+// subgraphs (graph representations of control flow primitives) into single
+// nodes until the entire graph is reduced into a single node or no structured
+// subgraphs may be located. The list of primitives is ordered in the same
+// sequence as they were located.
+func restructure(dotPath string) (prims []*Primitive, err error) {
 	graph, err := dot.ParseFile(dotPath)
 	if err != nil {
-		return errutil.Err(err)
+		return nil, errutil.Err(err)
+	}
+	if len(graph.Nodes.Nodes) == 0 {
+		return nil, errutil.Newf("unable to restructure empty graph %q", dotPath)
 	}
 	for len(graph.Nodes.Nodes) > 1 {
 		prim, err := findPrim(graph)
 		if err != nil {
-			return errutil.Err(err)
+			return nil, errutil.Err(err)
 		}
-		fmt.Println("prim:", prim)
+		prims = append(prims, prim)
 	}
-	return nil
+	return prims, nil
 }
 
-// A Primitive represents a high-level control flow primitive as mapping from
-// the node names of the control flow primitive descriptor to the node names of
-// the control flow graph.
+// A Primitive represents a high-level control flow primitive (e.g. if-
+// statement, for-loop) as mapping from the node names of the control flow
+// primitive descriptor to the node names of the control flow graph.
 type Primitive struct {
-	// Node name of the primitive; e.g. "list0".
-	NodeName string
 	// Primitive name; e.g. "if", "pre_loop", ...
-	PrimName string
+	Prim string `json:"prim"`
+	// Node name of the primitive; e.g. "list0".
+	Node string `json:"node"`
 	// Node mapping; e.g. {"A": 1, "B": 2, "C": 3}
-	Nodes map[string]string
+	Nodes map[string]string `json:"nodes"`
 }
 
 // findPrim locates a control flow primitive in the provided control flow graph
@@ -136,19 +146,21 @@ func findPrim(graph *dot.Graph) (*Primitive, error) {
 			// No match, try next control flow primitive.
 			continue
 		}
-		printMapping(graph, sub, m)
+		if flagVerbose {
+			printMapping(graph, sub, m)
+		}
 
 		// Merge the nodes of the subgraph isomorphism into a single node.
-		nodeName, err := merge.Merge(graph, m, sub)
+		node, err := merge.Merge(graph, m, sub)
 		if err != nil {
 			return nil, errutil.Err(err)
 		}
 
 		// Create a new control flow primitive.
 		prim := &Primitive{
-			NodeName: nodeName,
-			PrimName: sub.Name,
-			Nodes:    m,
+			Node:  node,
+			Prim:  sub.Name,
+			Nodes: m,
 		}
 		return prim, nil
 	}
@@ -165,9 +177,9 @@ func printMapping(graph *dot.Graph, sub *graphs.SubGraph, m map[string]string) {
 		snames = append(snames, sname)
 	}
 	sort.Strings(snames)
-	fmt.Printf("Isomorphism of %q found at node %q:\n", sub.Name, entry)
+	fmt.Fprintf(os.Stderr, "Isomorphism of %q found at node %q:\n", sub.Name, entry)
 	for _, sname := range snames {
-		fmt.Printf("   %q=%q\n", sname, m[sname])
+		fmt.Fprintf(os.Stderr, "   %q=%q\n", sname, m[sname])
 	}
 }
 

@@ -1,20 +1,19 @@
-{
-	"entry": "if0",
-	"primitives": {
-		"if0": {
-			"primitive": "if",
-			"nodes": {
-				"A": "E",
-				"B": "list0",
-				"C": "H",
-			},
-		},
-		"list0": {
-			"primitive": "list",
-			"nodes": {
-				"A": "F",
-				"B": "G",
-			},
-		},
+[
+	{
+		"prim": "list",
+		"node": "list0",
+		"nodes": {
+			"A": "F",
+			"B": "G"
+		}
 	},
-}
+	{
+		"prim": "if",
+		"node": "if0",
+		"nodes": {
+			"A": "E",
+			"B": "list0",
+			"C": "H"
+		}
+	},
+]

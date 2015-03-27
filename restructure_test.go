@@ -25,6 +25,21 @@ func TestRestructure(t *testing.T) {
 				},
 			},
 		},
+		{
+			path: "testdata/bar.dot",
+			want: []*Primitive{
+				{
+					Prim:  "if_else",
+					Node:  "if_else0",
+					Nodes: map[string]string{"A": "F", "B": "G", "C": "H", "D": "I"},
+				},
+				{
+					Prim:  "pre_loop",
+					Node:  "pre_loop0",
+					Nodes: map[string]string{"A": "X", "B": "Y", "C": "Z"},
+				},
+			},
+		},
 	}
 
 	for i, g := range golden {

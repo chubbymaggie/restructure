@@ -4,6 +4,8 @@ This project is a *work in progress*. The implementation is *incomplete* and sub
 
 # restructure
 
+[![Build Status](https://travis-ci.org/decomp/restructure.svg?branch=master)](https://travis-ci.org/decomp/restructure)
+[![Coverage Status](https://img.shields.io/coveralls/decomp/restructure.svg)](https://coveralls.io/r/decomp/restructure?branch=master)
 [![GoDoc](https://godoc.org/decomp.org/x/cmd/restructure?status.svg)](https://godoc.org/decomp.org/x/cmd/restructure)
 
 `restructure` is a tool which recovers high-level control flow primitives from control flow graphs (e.g. *.dot -> *.json). It takes an unstructured CFG (in Graphviz DOT file format) as input and produces a structured CFG (in JSON), which describes how the high-level control flow primitives relate to the nodes of the CFG.

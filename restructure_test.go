@@ -36,7 +36,7 @@ func TestRestructure(t *testing.T) {
 				{
 					Prim:  "pre_loop",
 					Node:  "pre_loop0",
-					Nodes: map[string]string{"A": "X", "B": "Y", "C": "Z"},
+					Nodes: map[string]string{"A": "E", "B": "if_else0", "C": "J"},
 				},
 			},
 		},

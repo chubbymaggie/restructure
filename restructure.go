@@ -205,6 +205,7 @@ var (
 )
 
 func init() {
+	flag.Parse()
 	var subPaths []string
 	switch {
 	case len(flagPrimitives) > 0:

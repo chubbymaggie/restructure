@@ -8,6 +8,8 @@
 //     restructure [OPTION]... CFG.dot
 //
 //     Flags:
+//       -indent
+//             Indent JSON output.
 //       -prims string
 //             Comma-separated list of control flow primitives (*.dot).
 //       -v    Verbose output.
@@ -47,9 +49,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -65,6 +69,8 @@ import (
 )
 
 var (
+	// When flagIndent is true, indent JSON output.
+	flagIndent bool
 	// flagPrimitives is a comma-separated list of control flow primitives
 	// (*.dot).
 	flagPrimitives string
@@ -73,6 +79,7 @@ var (
 )
 
 func init() {
+	flag.BoolVar(&flagIndent, "indent", false, "Indent JSON output.")
 	flag.StringVar(&flagPrimitives, "prims", "", "Comma-separated list of control flow primitives (*.dot).")
 	flag.BoolVar(&flagVerbose, "v", false, "Verbose output.")
 	flag.Usage = usage
@@ -98,6 +105,17 @@ func main() {
 	prims, err := restructure(dotPath)
 	if err != nil {
 		log.Fatalln(err)
+	}
+	if flagIndent {
+		buf, err := json.MarshalIndent(prims, "", "\t")
+		if err != nil {
+			log.Fatalln(err)
+		}
+		_, err = io.Copy(os.Stdout, bytes.NewReader(buf))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		return
 	}
 	enc := json.NewEncoder(os.Stdout)
 	err = enc.Encode(prims)

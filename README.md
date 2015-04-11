@@ -22,6 +22,8 @@ go get decomp.org/x/cmd/restructure
 restructure [OPTION]... CFG.dot
 
 Flags:
+  -indent
+        Indent JSON output.
   -prims string
         Comma-separated list of control flow primitives (*.dot).
   -v    Verbose output.
@@ -32,8 +34,8 @@ Flags:
 1) Recover the high-level control flow primitives from the control flow graph [foo.dot](testdata/foo.dot).
 
 ```bash
-$ restructure foo.dot
-// Output:
+$ restructure -v -indent foo.dot
+// Stderr output:
 // Isomorphism of "list" found at node "F":
 //    "A"="F"
 //    "B"="G"
@@ -41,6 +43,27 @@ $ restructure foo.dot
 //    "A"="E"
 //    "B"="list0"
 //    "C"="H"
+//
+// Output:
+[
+    {
+        "prim": "list",
+        "node": "list0",
+        "nodes": {
+            "A": "F",
+            "B": "G"
+        }
+    },
+    {
+        "prim": "if",
+        "node": "if0",
+        "nodes": {
+            "A": "E",
+            "B": "list0",
+            "C": "H"
+        }
+    }
+]
 ```
 
 INPUT:

@@ -19,11 +19,13 @@ go get decomp.org/x/cmd/restructure
 ## Usage
 
 ```
-restructure [OPTION]... CFG.dot
+restructure [OPTION]... [CFG.dot]
 
 Flags:
   -indent
         Indent JSON output.
+  -o string
+        Output path.
   -prims string
         Comma-separated list of control flow primitives (*.dot).
   -v    Verbose output.

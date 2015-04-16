@@ -5,11 +5,13 @@
 // nodes of the CFG.
 //
 // Usage:
-//     restructure [OPTION]... CFG.dot
+//     restructure [OPTION]... [CFG.dot]
 //
 //     Flags:
 //       -indent
 //             Indent JSON output.
+//       -o string
+//             Output path.
 //       -prims string
 //             Comma-separated list of control flow primitives (*.dot).
 //       -v    Verbose output.
@@ -54,6 +56,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -71,6 +74,8 @@ import (
 var (
 	// When flagIndent is true, indent JSON output.
 	flagIndent bool
+	// flagOutput specifies the output path.
+	flagOutput string
 	// flagPrimitives is a comma-separated list of control flow primitives
 	// (*.dot).
 	flagPrimitives string
@@ -80,13 +85,14 @@ var (
 
 func init() {
 	flag.BoolVar(&flagIndent, "indent", false, "Indent JSON output.")
+	flag.StringVar(&flagOutput, "o", "", "Output path.")
 	flag.StringVar(&flagPrimitives, "prims", "", "Comma-separated list of control flow primitives (*.dot).")
 	flag.BoolVar(&flagVerbose, "v", false, "Verbose output.")
 	flag.Usage = usage
 }
 
 const use = `
-restructure [OPTION]... CFG.dot
+restructure [OPTION]... [CFG.dot]
 Recover control flow primitives from control flow graphs (e.g. *.dot -> *.json).
 `
 
@@ -97,27 +103,47 @@ func usage() {
 
 func main() {
 	flag.Parse()
-	if flag.NArg() != 1 {
+	var dotPath string
+	switch flag.NArg() {
+	case 0:
+		// Read from stdin.
+		dotPath = "-"
+	case 1:
+		// Read from FILE.
+		dotPath = flag.Arg(0)
+	default:
 		flag.Usage()
 		os.Exit(1)
 	}
-	dotPath := flag.Arg(0)
+
+	// Create a structured CFG from the unstructured CFG.
 	prims, err := restructure(dotPath)
 	if err != nil {
 		log.Fatalln(err)
+	}
+
+	// Print the JSON to stdout or the path specified by -o.
+	w := os.Stdout
+	if len(flagOutput) > 0 {
+		f, err := os.Create(flagOutput)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer f.Close()
+		w = f
 	}
 	if flagIndent {
 		buf, err := json.MarshalIndent(prims, "", "\t")
 		if err != nil {
 			log.Fatalln(err)
 		}
-		_, err = io.Copy(os.Stdout, bytes.NewReader(buf))
+		_, err = io.Copy(w, bytes.NewReader(buf))
 		if err != nil {
 			log.Fatalln(err)
 		}
 		return
 	}
-	enc := json.NewEncoder(os.Stdout)
+	enc := json.NewEncoder(w)
 	err = enc.Encode(prims)
 	if err != nil {
 		log.Fatalln(err)
@@ -131,9 +157,25 @@ func main() {
 // subgraphs may be located. The list of primitives is ordered in the same
 // sequence as they were located.
 func restructure(dotPath string) (prims []*Primitive, err error) {
-	graph, err := dot.ParseFile(dotPath)
-	if err != nil {
-		return nil, errutil.Err(err)
+	// Parse the unstructured CFG.
+	var graph *dot.Graph
+	switch dotPath {
+	case "-":
+		// Read from stdin.
+		buf, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			return nil, errutil.Err(err)
+		}
+		graph, err = dot.Read(buf)
+		if err != nil {
+			return nil, errutil.Err(err)
+		}
+	default:
+		// Read for FILE.
+		graph, err = dot.ParseFile(dotPath)
+		if err != nil {
+			return nil, errutil.Err(err)
+		}
 	}
 	if len(graph.Nodes.Nodes) == 0 {
 		return nil, errutil.Newf("unable to restructure empty graph %q", dotPath)

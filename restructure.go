@@ -66,6 +66,7 @@ import (
 	"decomp.org/x/graphs"
 	"decomp.org/x/graphs/iso"
 	"decomp.org/x/graphs/merge"
+	"decomp.org/x/graphs/primitive"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
 	"github.com/mewkiz/pkg/goutil"
@@ -156,7 +157,7 @@ func main() {
 // nodes until the entire graph is reduced into a single node or no structured
 // subgraphs may be located. The list of primitives is ordered in the same
 // sequence as they were located.
-func restructure(dotPath string) (prims []*Primitive, err error) {
+func restructure(dotPath string) (prims []*primitive.Primitive, err error) {
 	// Parse the unstructured CFG.
 	var graph *dot.Graph
 	switch dotPath {
@@ -193,21 +194,9 @@ func restructure(dotPath string) (prims []*Primitive, err error) {
 	return prims, nil
 }
 
-// A Primitive represents a high-level control flow primitive (e.g. 2-way
-// conditional, pre-test loop) as a mapping from subgraph (graph representation
-// of a control flow primitive) node names to control flow graph node names.
-type Primitive struct {
-	// Primitive name; e.g. "if", "pre_loop", ...
-	Prim string `json:"prim"`
-	// Node name of the primitive; e.g. "list0".
-	Node string `json:"node"`
-	// Node mapping; e.g. {"A": 1, "B": 2, "C": 3}
-	Nodes map[string]string `json:"nodes"`
-}
-
 // findPrim locates a control flow primitive in the provided control flow graph
 // and merges its nodes into a single node.
-func findPrim(graph *dot.Graph) (*Primitive, error) {
+func findPrim(graph *dot.Graph) (*primitive.Primitive, error) {
 	for _, sub := range subs {
 		// Locate an isomorphism of sub in graph.
 		m, ok := iso.Search(graph, sub)
@@ -226,7 +215,7 @@ func findPrim(graph *dot.Graph) (*Primitive, error) {
 		}
 
 		// Create a new control flow primitive.
-		prim := &Primitive{
+		prim := &primitive.Primitive{
 			Node:  node,
 			Prim:  sub.Name,
 			Nodes: m,

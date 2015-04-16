@@ -3,16 +3,18 @@ package main
 import (
 	"reflect"
 	"testing"
+
+	"decomp.org/x/graphs/primitive"
 )
 
 func TestRestructure(t *testing.T) {
 	golden := []struct {
 		path string
-		want []*Primitive
+		want []*primitive.Primitive
 	}{
 		{
 			path: "testdata/foo.dot",
-			want: []*Primitive{
+			want: []*primitive.Primitive{
 				{
 					Prim:  "list",
 					Node:  "list0",
@@ -27,7 +29,7 @@ func TestRestructure(t *testing.T) {
 		},
 		{
 			path: "testdata/bar.dot",
-			want: []*Primitive{
+			want: []*primitive.Primitive{
 				{
 					Prim:  "if_else",
 					Node:  "if_else0",
